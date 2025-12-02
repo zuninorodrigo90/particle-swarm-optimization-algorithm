@@ -1,141 +1,212 @@
-# Particle Swarm Optimization (PSO) in Java
+# Particle Swarm Optimization (PSO) — Research & Statistical Performance Study
 
-This project provides a simple and educational implementation of **Particle Swarm Optimization (PSO)** in Java.  
-The goal is to offer a clear and intuitive version of PSO suitable for learning, experimenting, and understanding the core mechanics of the algorithm.
+This repository contains an implementation of **Particle Swarm Optimization (PSO)** in Java along with an experimental evaluation of multiple parameter configurations and their performance across 10 benchmark mathematical functions.
 
----
-
-## Overview
-
-Particle Swarm Optimization is a population-based metaheuristic inspired by the behavior of flocking birds.  
-Each particle represents a candidate solution and moves in the search space according to:
-
-- its **current velocity**
-- its **personal best position**
-- the **global best position** found by the swarm
-
-The algorithm iteratively updates velocities and positions until it converges or reaches a maximum number of iterations.
-
-This implementation supports different objective functions, including:
-
-- Sphere function
-- Sum of partial sums (quadratic)
-- Rosenbrock function
-- Schwefel-like sine function
+This project evolved from a simple PSO demo into a statistically rigorous experimentation framework using **non-parametric paired statistical testing (Wilcoxon Signed-Rank test)** to compare configurations.
 
 ---
 
-## Project Structure
+## What is PSO?
 
-### `Particle.java`
-Represents a single particle with:
-- position
-- velocity
-- personal best position
-- personal best value
+Particle Swarm Optimization is a metaheuristic inspired by the collective movement of animals (e.g., flocks of birds or schools of fish).  
+Each particle represents a candidate solution and moves based on:
 
-Includes different objective functions and the logic to evaluate and update personal best.
+- its current velocity
+- its personal historically best position (pBest)
+- the globally best position found (gBest)
 
-### `Main.java`
-Implements the core PSO loop:
-- swarm initialization
-- velocity and position updates
-- global best tracking
-- console input for number of particles and problem dimension
+PSO is widely used for optimization in:
+- engineering
+- neural network training
+- allocation problems
+- continuous optimization
+- parameter tuning
 
 ---
 
-## How the Algorithm Works
-
-1. Initialize a population of particles randomly.
-2. Evaluate each particle and store its personal best.
-3. Determine the global best across all particles.
-4. Iteratively update:
-    - velocity
-    - position
-    - personal best
-    - global best
-5. Return the best solution found.
-
----
-
-## Pseudocode
-
+## Pseudocode (algorithm behavior)
 ```
 Initialize N particles with random positions and velocities
-For each particle:
-    Evaluate its objective value
-    Store position as personal best (pbest)
+Evaluate objective value of each particle
+Store initial personal best pBest
+Select best pBest as global best gBest
 
-Set global best (gbest) as the best pbest in the swarm
-
-Repeat for MAX_ITERS iterations:
+For iteration = 1 to MAX_ITERS:
     For each particle:
-        Generate random numbers r1 and r2 in [0, 1]
+        r1, r2 ← random values in [0,1]
 
         Update velocity:
-            v = w * v
-                + c1 * r1 * (pbest - x)
-                + c2 * r2 * (gbest - x)
-
-        Clamp velocity to [-VMAX, VMAX]
+            v = W * v + C1 * r1 * (pBest – x) + C2 * r2 * (gBest – x)
 
         Update position:
             x = x + v
 
-        Clamp position to allowed bounds
-
         Evaluate objective value
-        If value improves pbest:
-            update pbest
+        If improved:
+            update pBest
 
-    Update gbest using all pbest values
+    Update gBest using all pBests
 
-Return gbest
+Return final gBest
+
+
 ```
+---
+
+## Benchmark functions used (F1–F10)
+
+These functions are standard in optimization research.
+
+| Func | Name | Difficulty | Notes |
+|------|------|------------|------|
+| F1 | Sphere | easy | convex, unimodal |
+| F2 | Sum of partial sums | medium | accumulates quadratic error |
+| F3 | Rosenbrock | hard | narrow curved valley |
+| F4 | Schwefel (sin-weighted) | deceptive | many local minima |
+| F5–F10 | additional continuous functions | mixed | test generalization |
+
+These functions allow testing:
+- ability to escape local minima
+- convergence speed
+- precision in final solution
 
 ---
 
-## Running the Program
+## Parameter Configurations
 
-The program will ask for:
-- number of particles
-- dimension of the search space
+Tested 5 PSO variants:
 
-Example run:
-
-```
-Enter the number of particles: 30
-Enter the dimension of the problem: 10
-Iter 0 -> gBest = ...
-Iter 100 -> gBest = ...
-...
-Best solution value found: <value>
-Best position: [...]
-```
+| label | W | C1 | C2 | Meaning |
+|------|----|----|----|---------|
+| baseline | 0.7 | 1.4 | 1.4 | balanced/default |
+| exploration | 0.95 | 1.0 | 1.0 | strong roaming, slow convergence |
+| exploitation | 0.3 | 2.0 | 2.0 | quick local convergence |
+| social | 0.6 | 0.5 | 2.5 | strong group influence |
+| cognitive | 0.6 | 2.5 | 0.5 | strong self-reinforcement |
 
 ---
 
-## Parameters Used
+## Experimental Methodology
 
-| Parameter | Meaning | Value |
-|----------|----------|--------|
-| `W` | Inertia weight | 0.5 |
-| `C1` | Cognitive component | 1.5 |
-| `C2` | Social component | 1.5 |
-| `VMAX` | Max velocity | 0.5 |
-| `LOWER/UPPER` | Search space bounds | [-30, 30] |
-| `MAX_ITERS` | Max iterations | 5000 |
+For each function F1–F10:
 
-These can be tweaked to observe performance differences.
+- each configuration was run **30 times**
+- results recorded per iteration
+- Extracted:
+    - best found value
+    - convergence behavior
+    - stability (variance)
+    - mean performance
+
+Example extract:
+
+F1:
+- baseline: 0.00000000016
+- exploration: 4.155
+- exploitation: 0.00264
+- social: 0.07419
+- cognitive: 0.06109
+
+
+
 
 ---
 
-## Notes
+## Statistical Comparison
 
-- Velocity clamping helps prevent explosion of particles.
-- The Rosenbrock function is challenging and commonly used for benchmarking.
-- Initialization uses fixed random seed for reproducibility.
-- The implementation is intentionally simple for educational purposes.
+Because optimization algorithms are **stochastic**, individual runs differ.
+
+So instead of comparing averages only, also used:
+
+### Wilcoxon Signed-Rank Test (non-parametric)
+
+Used to compare paired samples:  
+for each function:  
+baseline vs exploration  
+baseline vs exploitation  
+baseline vs social  
+baseline vs cognitive
+
+Properties:
+- distribution-free
+- non-parametric
+- valid on non-Gaussian data
+- widely used in optimization literature
+
+Tool used:
+- https://www.statskingdom.com/175wilcoxon_signed_ranks.html
+
+Interpretation:
+- if p ≤ 0.05 → statistically significant difference
+
+Example:  
+baseline vs exploitation → p = 0.001
+→ exploitation significantly different from baseline
+
+
+
+
+---
+
+## Results Summary (interpretation)
+
+- **exploitation** performs best on smooth, convex surfaces
+- **exploration** works better early but converges slowly
+- **social** can prematurely converge
+- **cognitive** is more chaotic but occasionally finds better minima
+
+The balanced **baseline** is a good general-purpose choice but gets outperformed on specific functions.
+
+---
+
+## Running the Project
+
+Compile & run:
+```
+javac *.java
+java Main
+```
+
+
+
+Example output:
+```
+====================================================
+                FUNCTION f1
+====================================================
+ 1) baseline     | W=0.70 C1=1.40 C2=1.40  | AVERAGE = 0.000000000001638
+ 2) exploration  | W=0.95 C1=1.00 C2=1.00  | AVERAGE = 5.028484589644786
+ 3) exploitation | W=0.30 C1=2.00 C2=2.00  | AVERAGE = 0.301484357306079
+ 4) social       | W=0.60 C1=0.50 C2=2.50  | AVERAGE = 0.000000000000000
+ 5) cognitive    | W=0.60 C1=2.50 C2=0.50  | AVERAGE = 13.293931068200127
+ 
+ ====================================================
+                FUNCTION f2
+====================================================
+ 1) baseline     | W=0.70 C1=1.40 C2=1.40  | AVERAGE = 0.073630054727399
+ 2) exploration  | W=0.95 C1=1.00 C2=1.00  | AVERAGE = 8.061792573584713
+ 3) exploitation | W=0.30 C1=2.00 C2=2.00  | AVERAGE = 0.326914750208013
+ 4) social       | W=0.60 C1=0.50 C2=2.50  | AVERAGE = 0.004289553314535
+ 5) cognitive    | W=0.60 C1=2.50 C2=0.50  | AVERAGE = 12.773782274007662
+
+====================================================
+                FUNCTION f3
+====================================================
+```
+
+
+
+---
+
+## Conclusion
+
+This project demonstrates:
+
+- implementation of PSO from scratch
+- experimental tuning of hyperparameters
+- objective benchmarking on multiple functions
+- rigorous statistical comparison of algorithmic behavior
+
+The methodology follows modern optimization research practice, ensuring reproducibility and validity of results.
 
 ---
