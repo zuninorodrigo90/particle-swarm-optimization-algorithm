@@ -1,4 +1,4 @@
-# Particle Swarm Optimization (PSO) — Research & Statistical Performance Study
+# Particle Swarm Optimization (PSO). Research & Statistical Performance Study
 
 This repository contains an implementation of **Particle Swarm Optimization (PSO)** in Java along with an experimental evaluation of multiple parameter configurations and their performance across 10 benchmark mathematical functions.
 
@@ -174,24 +174,18 @@ Example output:
 ====================================================
                 FUNCTION f1
 ====================================================
- 1) baseline     | W=0.70 C1=1.40 C2=1.40  | AVERAGE = 0.000000000001638
- 2) exploration  | W=0.95 C1=1.00 C2=1.00  | AVERAGE = 5.028484589644786
- 3) exploitation | W=0.30 C1=2.00 C2=2.00  | AVERAGE = 0.301484357306079
- 4) social       | W=0.60 C1=0.50 C2=2.50  | AVERAGE = 0.000000000000000
- 5) cognitive    | W=0.60 C1=2.50 C2=0.50  | AVERAGE = 13.293931068200127
- 
- ====================================================
-                FUNCTION f2
-====================================================
- 1) baseline     | W=0.70 C1=1.40 C2=1.40  | AVERAGE = 0.073630054727399
- 2) exploration  | W=0.95 C1=1.00 C2=1.00  | AVERAGE = 8.061792573584713
- 3) exploitation | W=0.30 C1=2.00 C2=2.00  | AVERAGE = 0.326914750208013
- 4) social       | W=0.60 C1=0.50 C2=2.50  | AVERAGE = 0.004289553314535
- 5) cognitive    | W=0.60 C1=2.50 C2=0.50  | AVERAGE = 12.773782274007662
-
-====================================================
-                FUNCTION f3
-====================================================
+ baseline | W=0.70 C1=1.40 C2=1.40 | RUN VALUES:
+   run  1: 0.000000000000000
+   run  2: 0.000000016557548
+   run  3: 0.000000000037430
+   run  4: 0.000000000000000
+   run  5: 0.000000000000000
+   run  6: 0.000000000000098
+   run  7: 0.000000019684150
+   run  8: 0.000000000000000
+   run  9: 0.000000000002520
+   run 10: 0.000000000000239
+   AVERAGE = 0.000000003628198
 ```
 
 

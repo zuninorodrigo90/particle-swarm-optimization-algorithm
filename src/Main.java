@@ -5,12 +5,14 @@ import java.util.Random;
 public class Main {
 
     // PSO hyperparameters
-    static final double LOWER = -10.0;
-    static final double UPPER = 10.0;
-    static final double VMAX = (UPPER - LOWER) * 0.1;
-    static final int MAX_ITERS = 2000;
-    static final int particlesNumber = 40;
-    static final int dimension = 30;
+    static final double LOWER = -10.0; // lower bound of search space
+    static final double UPPER = 10.0; // upper bound of search space
+    static final double VMAX = (UPPER - LOWER) * 0.1; // max allowed particle velocity
+    static final int MAX_ITERS = 2000; // number of iterations (stopping criterion)
+    static final int particlesNumber = 40; // number of particles in the swarm
+    static final int dimension = 30; // dimensionality of the problem (size of the vector)
+    static final int runs = 10; // number of independent runs for statistical evaluation
+
 
     static void main(String[] args) {
 
@@ -30,17 +32,8 @@ public class Main {
             System.out.println("====================================================");
 
             int index = 1;
+
             for (PSOConfig config : configs) {
-
-                int runs = 10;
-                double sum = 0;
-
-                for (int r = 1; r <= runs; r++) {
-                    double result = runPSOWithConfig(config, particlesNumber, dimension, functionId);
-                    sum += result;
-                }
-
-                double avg = sum / runs;
 
                 String name =
                         index == 1 ? "baseline" :
@@ -48,11 +41,22 @@ public class Main {
                                         index == 3 ? "exploitation" :
                                                 index == 4 ? "social" : "cognitive";
 
-                // print compact summary
-                System.out.printf(" %d) %-12s | W=%.2f C1=%.2f C2=%.2f  | AVERAGE = %.15f%n",
-                        index, name, config.W, config.C1, config.C2, avg);
+                System.out.printf(" %s | W=%.2f C1=%.2f C2=%.2f | RUN VALUES:\n",
+                        name, config.W, config.C1, config.C2);
+
+                double total = 0;
+
+                for (int r = 1; r <= runs; r++) {
+                    double result = runPSOWithConfig(config, particlesNumber, dimension, functionId);
+                    total += result;
+                    System.out.printf("   run %2d: %.15f\n", r, result);
+                }
+
+                double avg = total / runs;
+                System.out.printf("   AVERAGE = %.15f\n\n", avg);
 
                 index++;
+
             }
         }
 
